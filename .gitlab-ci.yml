@@ -2,7 +2,8 @@ pages:
   stage: deploy
   script:
   - mkdir .public
-  - cp -r * .public
+  - cp -r *.html robots.txt .public
+  - awk '{sub(/\{\{ deploy_date \}\}/, "'"$(git log -1 --pretty="format:%ci" index.html)"'")}1' index.html > .public/index.html
   - mv .public public
   artifacts:
     paths:
