@@ -17,9 +17,12 @@
     <link href="https://fonts.googleapis.com/css?family=Bitter|Merriweather+Sans:800|Source+Sans+Pro" rel="stylesheet">
     <style>
         body {margin: 0 5% 0 5%; }
-        h1 { font-family: 'Merriweather Sans', sans-serif; }
+        h1, h2, h3 { font-family: 'Merriweather Sans', sans-serif; }
         p { font-family: 'Source Sans Pro', sans-serif; }
         footer { font-family: 'Bitter', sans-serif; font-size: 10px; border-top: 2px gray solid; margin-top: 30px; padding-top: 10px; }
+        .blog-posts { display: none; }
+        .blog-posts h4 { margin-bottom: 0; }
+        .blog-posts-shown { display: initial; }
     </style>
 
     <!-- Google Tag Manager -->
@@ -45,7 +48,7 @@
         <p>
             Yes, you are looking at a relatively blank page. I am it fact a web developer; mostly 
             backend development with PHP. Which means you should be looking at a fancy page with all 
-            the bells and whistles, right? Well yes but have you ever seen a mechanic finish working on 
+            the bells and whistles, right? Well, yes but have you ever seen a mechanic finish working on 
             their own car?
         </p>
         <p>
@@ -75,6 +78,11 @@
             <li>Email: &quot;Devin&quot; at handspiker-wade.com</li>
             <li>Linkedin: <a href="https://www.linkedin.com/in/devin-handspiker-wade-41807390">Devin Handspiker-Wade</a></li>
         </ul>
+
+        <div class="blog-posts">
+            <h4>Recent blog posts:</h4>
+            <ul></ul>
+        </div>
 	</article>
 
 	<footer>
@@ -85,6 +93,41 @@
             <li>Tabs are the proper way to indent code. They&apos;re a character specifically meant for indentation.</li>
             <li>Opinions are based on my personal beliefs. They are not representative of any current or past employer.</li>
         </ol>
-	</footer>
+    </footer>
+    
+    <script>
+        (function() {
+            var httpRequest = new XMLHttpRequest();
+
+            httpRequest.onreadystatechange = function() {
+                if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                    if (httpRequest.status === 200) {
+                        var data = JSON.parse(httpRequest.responseText);
+                        if (data && data.length) {
+                            var list = document.querySelector('.blog-posts ul');
+                            var link;
+                            for (var i = 0; i < data.length; i++) {
+                                if (data[i].type_of === 'article') {
+                                    link = document.createElement('a');
+                                    link.innerText = data[i].title;
+                                    link.href = data[i].canonical_url;
+
+                                    document.createElement('li').appendChild(link);
+                                    list.appendChild(link.parentElement);
+                                }
+                            }
+
+                            list.parentElement.className += ' blog-posts-shown';
+                        }
+
+                    } else {
+                        console.log('There was a problem with requesting blog posts.');
+                    }
+                }
+            };
+            httpRequest.open('GET', 'https://dev.to/api/articles?username=dhandspikerwade');
+            httpRequest.send();
+        })();
+    </script>
 </body>
 </html>
